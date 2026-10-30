@@ -43,29 +43,43 @@
   });
 
   /* ---------- Reveal on scroll ---------- */
+  const pendingReveals = new Set();
+  let revealIO = null;
+
+  const reveal = (el) => {
+    if (!pendingReveals.delete(el)) return;
+    el.classList.add('is-visible');
+    if (revealIO) revealIO.unobserve(el);
+    // Once revealed, drop the reveal hooks so the element's own hover transitions take over
+    if (el.hasAttribute('data-reveal')) {
+      const delay = parseFloat(getComputedStyle(el).transitionDelay) || 0;
+      setTimeout(() => {
+        el.removeAttribute('data-reveal');
+        el.classList.remove('is-visible');
+      }, 1400 + delay * 1000);
+    }
+  };
+
+  // Safety net: anything that has scrolled into (or past) the viewport gets revealed even if
+  // the observer missed it, so content can never stay hidden.
+  const revealScrolledPast = () => {
+    pendingReveals.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.96) reveal(el);
+    });
+  };
+
   const startReveals = () => {
     const targets = $$('[data-reveal], [data-split]');
     if (reduceMotion || !('IntersectionObserver' in window)) {
       targets.forEach((el) => el.classList.add('is-visible'));
       return;
     }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        el.classList.add('is-visible');
-        io.unobserve(el);
-        // Once revealed, drop the reveal hooks so the element's own hover transitions take over
-        if (el.hasAttribute('data-reveal')) {
-          const delay = parseFloat(getComputedStyle(el).transitionDelay) || 0;
-          setTimeout(() => {
-            el.removeAttribute('data-reveal');
-            el.classList.remove('is-visible');
-          }, 1400 + delay * 1000);
-        }
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-    targets.forEach((el) => io.observe(el));
+    targets.forEach((el) => pendingReveals.add(el));
+    revealIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) reveal(entry.target); });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0 });
+    targets.forEach((el) => revealIO.observe(el));
+    revealScrolledPast();
   };
 
   /* ---------- Preloader ---------- */
@@ -84,7 +98,6 @@
   const progressBar = $('.scroll-progress');
   const toTop = $('.to-top');
   const parallaxEls = reduceMotion ? [] : $$('[data-parallax]');
-  let lastY = window.scrollY;
   let ticking = false;
 
   const onScroll = () => {
@@ -92,14 +105,8 @@
     const max = root.scrollHeight - window.innerHeight;
     const ratio = max > 0 ? Math.min(y / max, 1) : 0;
 
-    if (header) {
-      header.classList.toggle('is-scrolled', y > 40);
-      if (Math.abs(y - lastY) > 6) {
-        const goingDown = y > lastY;
-        header.classList.toggle('is-hidden', goingDown && y > 420 && !body.classList.contains('nav-open'));
-        lastY = y;
-      }
-    }
+    // The header stays fixed at the top; past the hero it switches to the compact glass style
+    if (header) header.classList.toggle('is-scrolled', y > 40);
     if (progressBar) progressBar.style.transform = `scaleX(${ratio})`;
     if (toTop) {
       toTop.classList.toggle('is-visible', y > 600);
@@ -107,12 +114,18 @@
     }
 
     parallaxEls.forEach((el) => {
+      const min = parseInt(el.dataset.parallaxMin, 10) || 0;
+      if (window.innerWidth < min) {
+        el.style.transform = '';
+        return;
+      }
       const box = el.parentElement.getBoundingClientRect();
       if (box.bottom < 0 || box.top > window.innerHeight) return;
       const speed = parseFloat(el.dataset.parallax) || 0.25;
       el.style.transform = `translate3d(0, ${(-box.top * speed).toFixed(1)}px, 0)`;
     });
 
+    if (pendingReveals.size) revealScrolledPast();
     ticking = false;
   };
 
@@ -781,17 +794,6 @@
     }
   }
   $$('[data-reels]').forEach((el) => new Reels(el));
-
-  /* ---------- Live chat buttons (Tawk.to) ----------
-     The chat bubble itself stays hidden (see the Tawk snippet); these buttons open it.
-     Without Tawk loaded they fall back to their WhatsApp link. */
-  $$('[data-chat]').forEach((btn) => btn.addEventListener('click', (e) => {
-    const api = window.Tawk_API;
-    if (!api || typeof api.maximize !== 'function') return;
-    e.preventDefault();
-    if (typeof api.showWidget === 'function') api.showWidget();
-    api.maximize();
-  }));
 
   /* ---------- Pointer effects (desktop only) ---------- */
   if (finePointer && !reduceMotion) {

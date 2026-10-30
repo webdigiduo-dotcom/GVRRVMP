@@ -355,7 +355,6 @@ body.lightbox-open { overflow: hidden; }
   color: var(--ink);
   box-shadow: 0 12px 30px -20px rgba(10, 29, 19, .45);
 }
-.site-header.is-hidden { transform: translateY(-100%); }
 
 .topbar {
   max-height: 44px;
@@ -1767,7 +1766,6 @@ body.lightbox-open { overflow: hidden; }
    Narrower screens: a bottom dock, with matching padding reserved on <body>. */
 :root {
   --fb: #1877f2;
-  --yt: #ff0033;
   --wa: #25d366;
   --ig: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
   --dock-h: 66px;
@@ -1848,10 +1846,9 @@ body.lightbox-open { overflow: hidden; }
 .social-btn:focus-visible::before { transform: scale(1); }
 .social-btn--fb { --brand: var(--fb); }
 .social-btn--ig { --brand: var(--ig); }
-.social-btn--yt { --brand: var(--yt); }
 .social-btn--wa { --brand: var(--wa); }
-.social-btn--chat { --brand: var(--lime); }
-.social-btn--chat:hover { color: var(--forest-950); }
+.social-btn--call { --brand: var(--lime); }
+.social-btn--call:hover { color: var(--forest-950); }
 .social-btn__tip {
   position: absolute;
   left: calc(100% + 16px);
@@ -1873,31 +1870,13 @@ body.lightbox-open { overflow: hidden; }
 }
 .social-btn:hover .social-btn__tip,
 .social-btn:focus-visible .social-btn__tip { opacity: 1; visibility: visible; transform: translate(0, -50%); }
-.social-btn__badge,
-.dock__badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
-  display: none;
-  place-items: center;
-  border-radius: 999px;
-  background: #e5484d;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-}
-.has-unread .social-btn__badge,
-.has-unread .dock__badge { display: grid; }
 
 .dock {
   position: fixed;
   left: 0; right: 0; bottom: 0;
   z-index: 95;
   display: none;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   align-items: center;
   height: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px));
   padding: 0 6px env(safe-area-inset-bottom, 0px);
@@ -1925,7 +1904,6 @@ body.lightbox-open { overflow: hidden; }
 .dock__item i { font-size: 19px; line-height: 1; transition: transform .35s var(--ease); }
 .dock__item:active i { transform: scale(.85); }
 .dock__item--fb i { color: var(--fb); }
-.dock__item--yt i { color: var(--yt); }
 .dock__item--wa i { color: var(--wa); }
 .dock__item--ig i {
   background: var(--ig);
@@ -1933,7 +1911,6 @@ body.lightbox-open { overflow: hidden; }
   background-clip: text;
   color: transparent;
 }
-.dock__item--chat i,
 .dock__item--call i { color: var(--lime); }
 .dock__book {
   position: relative;
@@ -1975,7 +1952,7 @@ body.lightbox-open { overflow: hidden; }
   .site-footer { padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 420px) {
-  .dock__item > span:not(.dock__badge) { display: none; }
+  .dock__item span { display: none; }
   .dock__item i { font-size: 20px; }
 }
 @media (max-height: 620px) and (min-width: 1281px) {
@@ -2332,8 +2309,12 @@ body.lightbox-open { overflow: hidden; }
 }
 .reel-modal.is-open .reel-modal__frame { transform: none; }
 .reel-modal video {
-  width: 100%;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
   max-height: calc(100svh - 190px);
+  margin-inline: auto;
   border-radius: 16px;
   background: #000;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .6);
@@ -2591,6 +2572,186 @@ body.lightbox-open { overflow: hidden; }
   .attractions-grid { grid-template-columns: 1fr; }
 }
 
+/* ---------- Attraction cards with photos + credits ---------- */
+.attraction__art { height: 190px; }
+.attraction__art--photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease);
+}
+.attraction__art--photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 29, 19, .35), transparent 45%);
+  pointer-events: none;
+}
+.attraction:hover .attraction__art--photo img { transform: scale(1.08); }
+.attraction__art--photo .attraction__icon {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 46px;
+  height: 46px;
+  font-size: 17px;
+  background: rgba(10, 29, 19, .4);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.attraction__art--photo .attraction__hills { z-index: 1; }
+
+.photo-credits {
+  margin-top: clamp(28px, 4vw, 44px);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.photo-credits summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.photo-credits summary::before { content: "\f030"; font: var(--fa-font-solid); color: var(--moss); }
+.photo-credits p { margin: 12px 0 8px; }
+.photo-credits ul { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.photo-credits a { color: var(--moss); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Stay in Nature (home) ---------- */
+.nature__grid {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  align-items: start;
+  gap: clamp(40px, 6vw, 96px);
+}
+.nature__intro { position: sticky; top: 130px; }
+.nature__intro .title-xl { margin-bottom: .4em; }
+.nature__points { margin: 30px 0 36px; }
+.nature__points li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+.nature__points i {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--lime-200);
+  color: var(--forest-700);
+  font-size: 16px;
+  transition: transform .5s var(--ease), background .4s;
+}
+.nature__points li:hover i { transform: rotate(-12deg) scale(1.08); background: var(--lime); }
+.nature__mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.nature__col { display: grid; align-content: start; gap: 18px; }
+.nature__col--offset { margin-top: clamp(40px, 8vw, 110px); }
+.nature__tile {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  background: var(--sand);
+  box-shadow: var(--shadow);
+}
+.nature__tile--tall { aspect-ratio: 3 / 4.4; }
+.nature__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s var(--ease);
+}
+.nature__tile:hover img { transform: scale(1.08); }
+.nature__tile figcaption {
+  position: absolute;
+  left: 14px; right: 14px; bottom: 14px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: rgba(10, 29, 19, .5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .5s var(--ease), transform .5s var(--ease);
+}
+.nature__tile:hover figcaption { opacity: 1; transform: none; }
+@media (hover: none) {
+  .nature__tile figcaption { opacity: 1; transform: none; }
+}
+
+.nature-pano {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: clamp(420px, 72vh, 680px);
+  padding-block: 90px;
+  overflow: hidden;
+  color: var(--cream);
+  text-align: center;
+  background: var(--forest-950);
+}
+.nature-pano__media {
+  position: absolute;
+  top: -15%;
+  left: 0;
+  z-index: -2;
+  width: 100%;
+  height: 130%;
+}
+.nature-pano__media img { width: 100%; height: 100%; object-fit: cover; }
+.nature-pano::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at center, rgba(10, 29, 19, .55), rgba(10, 29, 19, .2) 70%),
+    linear-gradient(180deg, rgba(10, 29, 19, .35), rgba(10, 29, 19, .55));
+}
+.nature-pano__content { display: grid; justify-items: center; }
+.nature-pano .eyebrow { justify-content: center; }
+.nature-pano blockquote {
+  max-width: 24ch;
+  margin: 0 0 34px;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.4vw, 3rem);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+@media (max-width: 900px) {
+  .nature__grid { grid-template-columns: 1fr; }
+  .nature__intro { position: static; }
+}
+@media (max-width: 560px) {
+  .nature__mosaic, .nature__col { gap: 12px; }
+  .nature__tile { border-radius: var(--radius); }
+  .nature__tile figcaption { left: 8px; right: 8px; bottom: 8px; padding: 7px 10px; font-size: 1rem; }
+}
+
 /* ---------- Reveal animations ---------- */
 .js [data-reveal] {
   opacity: 0;
@@ -2602,8 +2763,17 @@ body.lightbox-open { overflow: hidden; }
 .js [data-reveal="left"] { transform: translateX(-60px); }
 .js [data-reveal="right"] { transform: translateX(60px); }
 .js [data-reveal="zoom"] { transform: scale(.92); }
-.js [data-reveal="clip"] { opacity: 1; clip-path: inset(100% 0 0 0); }
-.js [data-reveal].is-visible { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
+.js [data-reveal].is-visible { opacity: 1; transform: none; }
+/* "clip" wipes the contents up from the bottom. The clip sits on the children, never on the
+   observed element itself: a fully clipped element reports zero visible area to
+   IntersectionObserver and would never be revealed. */
+.js [data-reveal="clip"] { opacity: 1; }
+.js [data-reveal="clip"] > * {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.3s var(--ease);
+  transition-delay: var(--d, 0s);
+}
+.js [data-reveal="clip"].is-visible > * { clip-path: inset(0 0 0 0); }
 
 .js [data-split] .w {
   display: inline-block;
@@ -2634,5 +2804,6 @@ body.lightbox-open { overflow: hidden; }
     transition-delay: 0s !important;
   }
   .js [data-reveal],
+  .js [data-reveal="clip"] > *,
   .js [data-split] .w > span { opacity: 1; transform: none; clip-path: none; }
 }
