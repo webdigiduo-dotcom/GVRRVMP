@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="css/style.css?v=20261030c">
+  <link rel="stylesheet" href="css/style.css?v=20261030f">
   <link rel="preload" as="image" href="img/GreenVelvet/slider-2.jpg">
   <script type="application/ld+json">
 {
@@ -96,40 +96,47 @@
   </header>
 
   <main id="main">
-  <section class="hero">
-    <div class="container hero__intro">
-      <div>
-        <p class="eyebrow eyebrow--light" data-reveal="up">Stay in Nature</p>
-        <h1 class="hero__title" data-split>Welcome To The Best Resort In Lonavala, Pawna Lake</h1>
-      </div>
-      <div class="hero__actions" data-reveal="up" style="--d:.6s">
-        <a class="btn" data-magnetic href="https://GreenVelvetresort.bookmystay.io?utm_source=webShare">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-        <a class="btn btn--outline" href="tel:+919819614673"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call Now</a>
-      </div>
-    </div>
-    <div class="hero__stage">
-      <div class="container hero__stage-inner">
-        <div class="badge-rotate" aria-hidden="true">
-          <svg viewBox="0 0 100 100"><defs><path id="badge-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#badge-circle">Stay in Nature &#8226; Green Velvet &#8226;</textPath></text></svg>
-          <i class="fa-solid fa-leaf"></i>
+  <section class="hero" data-hero>
+    <div class="hero__pin">
+      <div class="container hero__intro">
+        <div>
+          <p class="eyebrow eyebrow--light" data-reveal="up">Stay in Nature</p>
+          <h1 class="hero__title" data-split>Welcome To The Best Resort In Lonavala, Pawna Lake</h1>
         </div>
-        <div class="hero__frame" data-reveal="zoom" style="--d:.3s">
-          <video class="hero__video" src="img/cover1.mp4" id="vid" poster="img/GreenVelvet/slider-2.jpg" playsinline autoplay muted loop preload="auto"></video>
-          <button class="sound-toggle" id="audio-btn" type="button" aria-pressed="false">
-            <span class="sound-toggle__icon"><i class="fa-solid fa-music" id="mybtn" aria-hidden="true"></i></span>
-            <span class="sound-toggle__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-            <span class="sound-toggle__label">Sound off</span>
-          </button>
+        <div class="hero__actions" data-reveal="up" style="--d:.6s">
+          <a class="btn" data-magnetic href="https://GreenVelvetresort.bookmystay.io?utm_source=webShare">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <a class="btn btn--outline" href="tel:+919819614673"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call Now</a>
         </div>
       </div>
+      <div class="hero__stage">
+        <div class="container hero__stage-inner">
+          <div class="badge-rotate" aria-hidden="true">
+            <svg viewBox="0 0 100 100"><defs><path id="badge-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#badge-circle">Stay in Nature &#8226; Green Velvet &#8226;</textPath></text></svg>
+            <i class="fa-solid fa-leaf"></i>
+          </div>
+          <div class="hero__frame">
+            <video class="hero__video" src="img/cover1.mp4" id="vid" poster="img/GreenVelvet/slider-2.jpg" playsinline autoplay muted loop preload="auto"></video>
+            <div class="hero__finale" aria-hidden="true"><span>Stay in Nature</span></div>
+            <button class="sound-toggle" id="audio-btn" type="button" aria-pressed="false">
+              <span class="sound-toggle__icon"><i class="fa-solid fa-music" id="mybtn" aria-hidden="true"></i></span>
+              <span class="sound-toggle__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <span class="sound-toggle__label">Sound off</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <canvas class="fireflies" data-fireflies="30" aria-hidden="true"></canvas>
+      <svg class="wave wave--bottom" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
     </div>
   </section>
+
+  
 
   <section class="section" id="welcome">
     <div class="container split split--media-wide">
       <div class="split__text">
         <p class="eyebrow" data-reveal="up">Green Velvet Resort, Pawna</p>
-        <p class="display-quote" data-reveal="up">Experience a memorable vacation in Lonavala at Green Velvet Resort,
+        <p class="display-quote" data-scrub>Experience a memorable vacation in Lonavala at Green Velvet Resort,
           the ultimate hideaway situated in the Sahyadri hills.</p>
         <p data-reveal="up">Conveniently located between Mumbai and Pune, our 3-star luxury resort offers an atmosphere of
           beauty and peace just a short drive away. Renowned for our lavish amenities and prime location, we're the top
@@ -159,6 +166,104 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+     <section class="reels" id="videos" data-reels>
+    <svg class="wave wave--top" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
+    <canvas class="reels__ambient" width="48" height="27" aria-hidden="true"></canvas>
+    <div class="reels__glow" aria-hidden="true"><span></span><span></span></div>
+    <canvas class="fireflies" data-fireflies="20" aria-hidden="true"></canvas>
+    <div class="scroll-type scroll-type--light" aria-hidden="true" data-scroll-x="-0.16">Moments &nbsp; Moments &nbsp; Moments &nbsp; Moments</div>
+    <div class="container reels__head">
+      <div>
+        <p class="eyebrow" data-reveal="up">Stay in Nature, on Reel</p>
+        <h2 class="title-lg" data-reveal="up">Moments at <span class="accent">Green Velvet</span></h2>
+      </div>
+      <div class="reels__side" data-reveal="up">
+        <p>Drag, swipe or tap through short clips from around the resort. Tap the playing video to watch it full screen,
+          or double-tap to send it some love.</p>
+        <a class="reels__follow" href="https://www.instagram.com/greenvelvetresort/" target="_blank" rel="noopener">
+          <img src="img/GreenVelvet/logo_2.png" alt="" width="42" height="42" loading="lazy">
+          <span><strong>greenvelvetresort</strong><small>Follow us on Instagram</small></span>
+          <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+    <div class="reels__stories" role="group" aria-label="Choose a video"></div>
+    <div class="reels__stage">
+      <span class="reels__probe" aria-hidden="true"></span>
+      <div class="reels__track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Resort videos. Use the left and right arrow keys to browse and Enter to watch full screen.">
+        <article class="reel" data-src="img/reels/insta-escape.mp4" data-label="Escape" data-silent>
+          <img class="reel__poster" src="img/reels/insta-escape.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">From Instagram</span><h3 class="reel__title">Your Sign to Escape</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/reels/insta-weekends.mp4" data-label="Weekends" data-silent>
+          <img class="reel__poster" src="img/reels/insta-weekends.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">From Instagram</span><h3 class="reel__title">Weekends Feel Better</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Arrival" data-start="2" data-end="14" style="--focus: 66% 50%">
+          <img class="reel__poster" src="img/reels/reel-1.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Arrival</span><h3 class="reel__title">Welcome to Green Velvet</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Cottages" data-start="41" data-end="54">
+          <img class="reel__poster" src="img/reels/reel-2.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">The Resort</span><h3 class="reel__title">Cottages &amp; Lawns</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Rooms" data-start="64" data-end="82">
+          <img class="reel__poster" src="img/reels/reel-3.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Stay</span><h3 class="reel__title">Rooms with a View</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Gardens" data-start="100" data-end="118">
+          <img class="reel__poster" src="img/reels/reel-4.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Explore</span><h3 class="reel__title">Garden Walks</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Dining" data-start="160" data-end="178">
+          <img class="reel__poster" src="img/reels/reel-5.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Dining</span><h3 class="reel__title">'Flavours' Restaurant</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Poolside" data-start="185" data-end="200">
+          <img class="reel__poster" src="img/reels/reel-6.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Unwind</span><h3 class="reel__title">Poolside Moments</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+        <article class="reel" data-src="img/cover1.mp4" data-label="Sunset" data-start="220" data-end="233">
+          <img class="reel__poster" src="img/reels/reel-7.jpg" alt="" loading="lazy" draggable="false">
+          <div class="reel__shade"></div>
+          <div class="reel__bar"><span></span></div>
+          <div class="reel__meta"><span class="reel__tag">Evenings</span><h3 class="reel__title">Sunset in the Sahyadris</h3></div>
+          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+        </article>
+      </div>
+    </div>
+    <div class="container reels__controls">
+      <button class="reels__btn" type="button" data-reels-prev aria-label="Previous video"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
+      <span class="reels__count" aria-live="polite">01 / 09</span>
+      <button class="reels__btn" type="button" data-reels-next aria-label="Next video"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      <button class="reels__btn" type="button" data-reels-play aria-label="Pause videos"><i class="fa-solid fa-pause" aria-hidden="true"></i></button>
+      <button class="reels__btn" type="button" data-reels-mute aria-pressed="false" aria-label="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button>
     </div>
   </section>
 
@@ -203,24 +308,16 @@
     </div>
   </section>
 
-  <section class="nature-pano" aria-label="Green Velvet Resort, Pawna">
-    <div class="nature-pano__media" data-parallax="0.22"><img src="img/nature/cottages-blue-sky.jpg" alt="" loading="lazy"></div>
-    <div class="container nature-pano__content">
-      <p class="eyebrow eyebrow--light eyebrow--center" data-reveal="up">Green Velvet, Pawna</p>
-      <blockquote data-reveal="up">Bejeweled in the lap of nature, Green Velvet in Pawna is the idyllic location for a perfect
-        weekend getaway, away from the hustle and bustle of city life.</blockquote>
-      <div class="btn-row" data-reveal="up">
-        <a class="btn" data-magnetic href="https://GreenVelvetresort.bookmystay.io?utm_source=webShare">Book Your Stay <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-      </div>
-    </div>
-  </section>
+ 
+
+
 
   <section class="section section--dark experience">
     <div class="container">
       <div class="section-head">
         <h2 class="title-lg" data-reveal="up">Experience Nature, Tranquility At<br>
           <span class="accent">Luxury Green Velvet Resort In Lonavala, Pawna Lake</span></h2>
-        <p class="lead" data-reveal="up">Discover the serene charm of Green Velvet Resort, nestled in the heart of Pawna
+        <p class="lead" data-scrub>Discover the serene charm of Green Velvet Resort, nestled in the heart of Pawna
           Lake. Our cosy rooms offer mesmerising views of Pawna Lake, ensuring a delightful stay. Choose from our
           accommodations, including cottages and villas, designed for your comfort. Unwind by the pool, let the kids play,
           or explore our lush garden. Indulge in culinary delights at our restaurant and enjoy complimentary Wi-Fi and
@@ -234,7 +331,7 @@
             <span class="circle-arrow" aria-hidden="true"><i class="fa-solid fa-person-swimming"></i></span>
           </figcaption>
         </figure>
-        <a class="feature-card" href="dining.html" data-reveal="up">
+        <a class="feature-card" href="dining.html" data-reveal="up" data-cursor="Explore">
           <img src="img/new/13.jpg" alt="'Flavours' Restaurant at Green Velvet Resort, Pawna" loading="lazy">
           <div class="feature-card__body">
             <h3>'Flavours' Restaurant</h3>
@@ -269,6 +366,7 @@
   </div>
 
   <section class="section rooms">
+    <div class="scroll-type" aria-hidden="true" data-scroll-x="0.2">Stay in Nature &nbsp; Stay in Nature &nbsp; Stay in Nature</div>
     <div class="container">
       <div class="section-head">
         <p class="eyebrow eyebrow--center" data-reveal="up">Stay In Pawna</p>
@@ -280,36 +378,24 @@
       </div>
       <div class="room-grid" data-stagger>
         <article class="room-card" data-reveal="up">
-          <div class="slider" data-slider data-interval="4000" id="demo3">
-            <div class="slider__viewport">
-              <figure class="slider__slide is-active"><img src="images/cottagee1.jpeg" alt="Best Resorts in Lonavala" loading="lazy"></figure>
-              <figure class="slider__slide"><img src="cottagee.jpeg" alt="Luxury Resorts in Lonavala" loading="lazy"></figure>
-            </div>
-            <div class="slider__progress"><span></span></div>
-            <div class="slider__ui">
-              <button class="slider__btn" type="button" data-prev aria-label="Previous slide"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
-              <div class="slider__dots"></div>
-              <button class="slider__btn" type="button" data-next aria-label="Next slide"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            </div>
-          </div>
+          <a class="lens" href="accommodation.html#ac-c" data-lens data-cursor="Peek inside" aria-label="A/C Cottage details">
+            <img class="lens__base" src="images/cottagee1.jpeg" alt="Best Resorts in Lonavala" loading="lazy">
+            <img class="lens__alt" src="cottagee.jpeg" alt="Luxury Resorts in Lonavala" loading="lazy">
+            <span class="lens__ring" aria-hidden="true"></span>
+            <span class="lens__hint" aria-hidden="true">Move here to peek inside</span>
+          </a>
           <a class="room-card__body" href="accommodation.html#ac-c">
             <h3 class="room-card__title">A/C Cottage</h3>
             <span class="circle-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
           </a>
         </article>
         <article class="room-card" data-reveal="up">
-          <div class="slider" data-slider data-interval="4600" id="demo4">
-            <div class="slider__viewport">
-              <figure class="slider__slide is-active"><img src="images/3bhk1.jpeg" alt="Best Resorts in Lonavala" loading="lazy"></figure>
-              <figure class="slider__slide"><img src="images/3bhk2.jpeg" alt="Luxury Resorts in Lonavala" loading="lazy"></figure>
-            </div>
-            <div class="slider__progress"><span></span></div>
-            <div class="slider__ui">
-              <button class="slider__btn" type="button" data-prev aria-label="Previous slide"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
-              <div class="slider__dots"></div>
-              <button class="slider__btn" type="button" data-next aria-label="Next slide"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            </div>
-          </div>
+          <a class="lens" href="accommodation.html#3-bhk" data-lens data-cursor="Peek inside" aria-label="3 BHK Villa details">
+            <img class="lens__base" src="images/3bhk1.jpeg" alt="Best Resorts in Lonavala" loading="lazy">
+            <img class="lens__alt" src="images/3bhk2.jpeg" alt="Luxury Resorts in Lonavala" loading="lazy">
+            <span class="lens__ring" aria-hidden="true"></span>
+            <span class="lens__hint" aria-hidden="true">Move here to peek inside</span>
+          </a>
           <a class="room-card__body" href="accommodation.html#3-bhk">
             <h3 class="room-card__title">3 BHK Villa</h3>
             <span class="circle-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></span>
@@ -319,105 +405,7 @@
     </div>
   </section>
 
-  <section class="reels" id="videos" data-reels>
-    <svg class="wave wave--top" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
-    <div class="reels__glow" aria-hidden="true"><span></span><span></span></div>
-    <div class="container">
-      <div class="section-head">
-        <p class="eyebrow eyebrow--center" data-reveal="up">Stay in Nature, on Reel</p>
-        <h2 class="title-lg" data-reveal="up">Moments at <span class="accent">Green Velvet</span></h2>
-        <p class="lead" data-reveal="up">Drag, swipe or tap through short clips from around the resort. Tap the playing
-          video to watch it full screen with sound.</p>
-      </div>
-    </div>
-    <div class="reels__stage" data-reveal="zoom">
-      <div class="reels__track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Resort videos. Use the left and right arrow keys to browse and Enter to watch full screen.">
-        <article class="reel" data-src="img/reels/insta-escape.mp4">
-          <img class="reel__poster" src="img/reels/insta-escape.jpg" alt="" width="720" height="900" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">01</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">From Instagram</span><h3 class="reel__title">Your Sign to Escape</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/reels/insta-weekends.mp4">
-          <img class="reel__poster" src="img/reels/insta-weekends.jpg" alt="" width="720" height="900" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">02</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">From Instagram</span><h3 class="reel__title">Weekends Feel Better</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="2" data-end="14" style="--focus: 66% 50%">
-          <img class="reel__poster" src="img/reels/reel-1.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">03</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Arrival</span><h3 class="reel__title">Welcome to Green Velvet</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="41" data-end="54">
-          <img class="reel__poster" src="img/reels/reel-2.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">04</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">The Resort</span><h3 class="reel__title">Cottages &amp; Lawns</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="64" data-end="82">
-          <img class="reel__poster" src="img/reels/reel-3.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">05</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Stay</span><h3 class="reel__title">Rooms with a View</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="100" data-end="118">
-          <img class="reel__poster" src="img/reels/reel-4.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">06</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Explore</span><h3 class="reel__title">Garden Walks</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="160" data-end="178">
-          <img class="reel__poster" src="img/reels/reel-5.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">07</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Dining</span><h3 class="reel__title">'Flavours' Restaurant</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="185" data-end="200">
-          <img class="reel__poster" src="img/reels/reel-6.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">08</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Unwind</span><h3 class="reel__title">Poolside Moments</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-        <article class="reel" data-src="img/cover1.mp4" data-start="220" data-end="233">
-          <img class="reel__poster" src="img/reels/reel-7.jpg" alt="" width="384" height="480" loading="lazy" draggable="false">
-          <div class="reel__shade"></div>
-          <div class="reel__top"><span class="reel__num">09</span><span class="reel__live">Playing</span></div>
-          <div class="reel__meta"><span class="reel__tag">Evenings</span><h3 class="reel__title">Sunset in the Sahyadris</h3></div>
-          <span class="reel__open" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-          <div class="reel__bar"><span></span></div>
-        </article>
-      </div>
-    </div>
-    <div class="container">
-      <div class="reels__controls" data-reveal="up">
-        <span class="reels__count" aria-live="polite">01 / 09</span>
-        <button class="reels__btn" type="button" data-reels-prev aria-label="Previous video"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>
-        <div class="reels__dots"></div>
-        <button class="reels__btn" type="button" data-reels-next aria-label="Next video"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-        <button class="reels__btn" type="button" data-reels-play aria-label="Pause videos"><i class="fa-solid fa-pause" aria-hidden="true"></i></button>
-        <button class="reels__btn" type="button" data-reels-mute aria-pressed="false" aria-label="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button>
-      </div>
-      <p class="reels__hint"><i class="fa-regular fa-hand-pointer" aria-hidden="true"></i> Drag or swipe to browse</p>
-    </div>
-  </section>
+
   </main>
 
   <footer class="site-footer">
@@ -490,6 +478,6 @@
     <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
   </button>
 
-  <script src="js/main.js?v=20261030c" defer></script>
+  <script src="js/main.js?v=20261030f" defer></script>
 </body>
 </html>

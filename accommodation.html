@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="css/style.css?v=20261030c">
+  <link rel="stylesheet" href="css/style.css?v=20261030f">
   <link rel="preload" as="image" href="img/latest/3.jpg">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3RBBYKK4RE"></script>
@@ -85,15 +85,42 @@
       <h1 class="page-hero__title" data-split>Cottages in Pawna</h1>
       <p class="page-hero__sub" data-reveal="up" style="--d:.55s">Comfortable cottages and best villas in pawna for a nature filled Vacation.</p>
     </div>
+    <canvas class="fireflies" data-fireflies="26" aria-hidden="true"></canvas>
     <svg class="wave wave--bottom" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
   </section>
 
-  <section class="section">
+  <div class="container room-picker" data-stagger>
+    <a class="room-pick" href="#ac-c" data-reveal="up">
+      <img src="images/Cottage1.jpeg" alt="" loading="lazy">
+      <span><small>Stay In Lonavala</small><strong>A/C Cottages</strong></span>
+      <span class="circle-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+    </a>
+    <a class="room-pick" href="#3-bhk" data-reveal="up">
+      <img src="img/GreenVelvet/75.jpeg" alt="" loading="lazy">
+      <span><small>Best Villa In Lonavala</small><strong>3 BHK Villa</strong></span>
+      <span class="circle-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+    </a>
+  </div>
+
+  <nav class="subnav" data-subnav aria-label="On this page">
+    <div class="subnav__track">
+      <span class="subnav__ink" aria-hidden="true"></span>
+      <a href="#rooms-suites">Rooms &amp; Suites</a>
+      <a href="#ac-c">A/C Cottages</a>
+      <a href="#3-bhk">3 BHK Villa</a>
+      <a href="#step-inside">Step Inside</a>
+      <a href="#amenities">Amenities</a>
+      <a href="#facilities">Facilities</a>
+      <a href="#house-rules">House Rules</a>
+    </div>
+  </nav>
+
+  <section class="section" id="rooms-suites">
     <div class="container split split--media-wide">
       <div class="split__text">
         <p class="eyebrow" data-reveal="up">Green Velvet Resort, Pawna</p>
         <h2 class="title-lg" data-reveal="up">Rooms &amp; <span class="accent">Suites</span></h2>
-        <p data-reveal="up">Green Velvet Resort, a luxury villa in Lonavala, features modern rooms and suites with
+        <p data-scrub>Green Velvet Resort, a luxury villa in Lonavala, features modern rooms and suites with
           breathtaking views of the neighbouring hills and calm Pawna Lake. Our Villa rooms prioritise guest comfort,
           with cutting-edge features to ensure an enjoyable stay.</p>
         <div class="btn-row" data-reveal="up" style="margin-top:34px">
@@ -121,10 +148,11 @@
   </section>
 
   <section class="section section--alt rooms-container">
-    <div class="container">
-      <article class="room-feature" id="ac-c">
-        <div class="room-feature__media frame" data-reveal="left">
-          <div class="slider" data-slider data-interval="3500" id="demo1">
+    <div class="container" data-stack>
+      <span class="room-anchor" id="ac-c"></span>
+      <article class="room-panel">
+        <div class="room-panel__media">
+          <div class="slider" data-slider data-thumbs data-interval="3500" id="demo1">
             <div class="slider__viewport">
               <figure class="slider__slide is-active"><img src="img/ac-cottage1.jpg" alt="Best Resorts in Lonavala" loading="lazy"></figure>
               <figure class="slider__slide"><img src="img/ac-cottage2.jpg" alt="Luxury Resorts in Lonavala" loading="lazy"></figure>
@@ -144,7 +172,7 @@
             </div>
           </div>
         </div>
-        <div class="room-feature__text">
+        <div class="room-panel__text">
           <span class="room-feature__index" aria-hidden="true" data-reveal="up">01</span>
           <h2 class="room-feature__title" data-reveal="up">A/C Cottages<br><span class="accent">Stay In Lonavala</span></h2>
           <p data-reveal="up">Green Velvet Resort stands out as the best place to stay in Lonavala, Our establishment
@@ -158,15 +186,15 @@
             <li data-reveal="zoom" title="HD LED smart TV"><img src="img/TV.png" alt="HD LED smart TV" loading="lazy"></li>
           </ul>
           <div class="btn-row" data-reveal="up">
-            <a class="btn btn--dark" href="contact.html">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            <a class="btn" href="contact.html">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
             <a class="btn btn--outline" href="tel:+919819614673"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call Now</a>
           </div>
         </div>
       </article>
-
-      <article class="room-feature room-feature--reverse" id="3-bhk">
-        <div class="room-feature__media frame frame--right" data-reveal="right">
-          <div class="slider" data-slider data-interval="3700" id="demo2">
+      <span class="room-anchor" id="3-bhk"></span>
+      <article class="room-panel room-panel--alt">
+        <div class="room-panel__media">
+          <div class="slider" data-slider data-thumbs data-interval="3700" id="demo2">
             <div class="slider__viewport">
               <figure class="slider__slide is-active"><img src="img/GreenVelvet/75.jpeg" alt="Best Resorts in Lonavala" loading="lazy"></figure>
               <figure class="slider__slide"><img src="img/GreenVelvet/52.jpeg" alt="Luxury Resorts in Lonavala" loading="lazy"></figure>
@@ -184,7 +212,7 @@
             </div>
           </div>
         </div>
-        <div class="room-feature__text">
+        <div class="room-panel__text">
           <span class="room-feature__index" aria-hidden="true" data-reveal="up">02</span>
           <h2 class="room-feature__title" data-reveal="up">3 BHK Villa<br><span class="accent">Best Villa In Lonavala</span></h2>
           <p data-reveal="up">Experience our classic rooms and suites adorned with the breathtaking beauty of Lonavala,
@@ -203,7 +231,7 @@
             <li data-reveal="zoom" title="Free parking"><img src="img/parking.png" alt="Free parking" loading="lazy"></li>
           </ul>
           <div class="btn-row" data-reveal="up">
-            <a class="btn btn--dark" href="contact.html">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            <a class="btn" href="contact.html">Book Now <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
             <a class="btn btn--outline" href="tel:+919819614673"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call Now</a>
           </div>
         </div>
@@ -211,7 +239,42 @@
     </div>
   </section>
 
-  <section class="section amenities">
+  <section class="section section--alt tour" id="step-inside">
+    <div class="container" data-tour>
+      <div class="section-head">
+        <p class="eyebrow eyebrow--center" data-reveal="up">Take a look around</p>
+        <h2 class="title-lg" data-reveal="up">Step <span class="accent">Inside</span></h2>
+      </div>
+      <div class="tour__stage" data-reveal="zoom">
+        <div class="tour__media">
+          <img src="img/Gallery/gv-suite.jpg" alt="Inside an A/C cottage at Green Velvet Resort" width="1800" height="812" loading="lazy">
+            <button class="pin" type="button" style="--x:76%;--y:11%" data-side="left" aria-label="Air Conditioned Rooms">
+              <span class="pin__dot"></span>
+              <span class="pin__card"><i class="fa-regular fa-snowflake" aria-hidden="true"></i>Air Conditioned Rooms</span>
+            </button>
+            <button class="pin" type="button" style="--x:11%;--y:30%" aria-label="HD LED Smart TV">
+              <span class="pin__dot"></span>
+              <span class="pin__card"><i class="fa-solid fa-tv" aria-hidden="true"></i>HD LED Smart TV</span>
+            </button>
+            <button class="pin" type="button" style="--x:23%;--y:40%" aria-label="Wardrobe">
+              <span class="pin__dot"></span>
+              <span class="pin__card"><i class="fa-solid fa-shirt" aria-hidden="true"></i>Wardrobe</span>
+            </button>
+            <button class="pin" type="button" style="--x:63%;--y:47%" data-side="left" aria-label="Tea / Coffee Maker">
+              <span class="pin__dot"></span>
+              <span class="pin__card"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i>Tea / Coffee Maker</span>
+            </button>
+            <button class="pin" type="button" style="--x:50%;--y:33%" data-side="left" aria-label="Lawn / Garden">
+              <span class="pin__dot"></span>
+              <span class="pin__card"><i class="fa-solid fa-seedling" aria-hidden="true"></i>Lawn / Garden</span>
+            </button>
+        </div>
+      </div>
+      <div class="tour__legend"></div>
+    </div>
+  </section>
+
+  <section class="section amenities" id="amenities">
     <div class="container">
       <div class="section-head">
         <span class="section-icon" aria-hidden="true" data-reveal="zoom"><i class="fa-solid fa-leaf"></i></span>
@@ -246,71 +309,86 @@
     </div>
   </section>
 
-  <section class="section section--dark facilities">
+  <section class="section section--dark facilities" id="facilities">
     <svg class="wave wave--top" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
     <div class="container">
       <div class="section-head">
         <span class="section-icon" aria-hidden="true" data-reveal="zoom"><i class="fa-solid fa-leaf"></i></span>
         <h2 class="title-lg" data-reveal="up">Facilities</h2>
       </div>
-      <div class="icon-grid" data-stagger>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i></div>
+      <div class="bento" data-stagger>
+        <figure class="bento__tile bento__tile--xl" data-reveal="up">
+          <img src="img/nature/sunset-pool.jpg" alt="Swimming pool at Green Velvet Resort" loading="lazy">
+          <figcaption><i class="fa-solid fa-person-swimming" aria-hidden="true"></i>Swimming Pool</figcaption>
+        </figure>
+        <figure class="bento__tile bento__tile--wide" data-reveal="up">
+          <img src="img/new/13.jpg" alt="'Flavours' in-house restaurant" loading="lazy">
+          <figcaption><i class="fa-solid fa-utensils" aria-hidden="true"></i>In-house Restaurant</figcaption>
+        </figure>
+        <figure class="bento__tile" data-reveal="up">
+          <img src="img/Gallery/gv-games-room-sq.jpg" alt="Indoor games room" loading="lazy">
+          <figcaption><i class="fa-solid fa-dice" aria-hidden="true"></i>Indoor Games</figcaption>
+        </figure>
+        <figure class="bento__tile" data-reveal="up">
+          <img src="img/Gallery/view-2-1.jpg" alt="Lawns and gardens at Green Velvet Resort" loading="lazy">
+          <figcaption><i class="fa-regular fa-image" aria-hidden="true"></i>Lawn / Garden</figcaption>
+        </figure>
+        <div class="bento__tile bento__tile--icon" data-reveal="up">
+          <i class="fa-regular fa-thumbs-up" aria-hidden="true"></i>
           <h3>House Keeping</h3>
         </div>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-solid fa-utensils" aria-hidden="true"></i></div>
-          <h3>In-house Restaurant</h3>
-        </div>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-solid fa-person-swimming" aria-hidden="true"></i></div>
-          <h3>Swimming Pool</h3>
-        </div>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-regular fa-image" aria-hidden="true"></i></div>
-          <h3>Lawn / Garden</h3>
-        </div>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-solid fa-car" aria-hidden="true"></i></div>
+        <div class="bento__tile bento__tile--icon" data-reveal="up">
+          <i class="fa-solid fa-car" aria-hidden="true"></i>
           <h3>Free Covered Parking</h3>
-        </div>
-        <div class="icon-card" data-reveal="up" data-tilt>
-          <div class="icon-card__icon"><i class="fa-solid fa-dice" aria-hidden="true"></i></div>
-          <h3>Indoor Games</h3>
         </div>
       </div>
     </div>
     <svg class="wave wave--bottom" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M-60,46 C140,96 340,96 540,62 C740,28 920,4 1100,24 C1280,44 1380,74 1500,62 L1500,100 L-60,100 Z"/><path fill="currentColor" d="M0,72 C200,42 400,32 600,56 C800,80 1000,96 1200,72 C1320,58 1390,52 1440,56 L1440,100 L0,100 Z"/></svg>
   </section>
 
-  <section class="section house-rules">
-    <div class="container">
-      <div class="section-head">
+  <section class="section house-rules" id="house-rules">
+    <div class="container" data-tabs>
+      <div class="section-head" style="margin-bottom:clamp(24px,3vw,36px)">
         <span class="section-icon" aria-hidden="true" data-reveal="zoom"><i class="fa-solid fa-leaf"></i></span>
         <h2 class="title-lg" data-reveal="up">House Rules</h2>
       </div>
-      <ul class="rules" data-reveal="up">
-        <li><p>Usage of swimming pool allowed only with proper costumes</p></li>
-        <li><p>Use proper swimming attire and shower first before using the pool</p></li>
-        <li><p>Food and drinks are not allowed in/near the pool area</p></li>
-        <li><p>Children must be accompanied by parents at all time</p></li>
-        <li><p>No diving in pool</p></li>
-        <li><p>Smoking inside the rooms is not allowed</p></li>
-        <li><p>Pets are not allowed</p></li>
-        <li><p>No littering and plucking the plants</p></li>
-        <li><p>Kindly note the market is 8kms from the property, if the guest wish to order or buy something they need to pay in advance and also bare the travelling charges</p></li>
-        <li><p>Drinking is allowed inside the rooms and balcony</p></li>
-        <li><p>Any Damage caused to the property will be charged accordingly</p></li>
-        <li><p>No Loud music is allowed at the property</p></li>
-        <li><p>Please approach the reception for any concern</p></li>
-        <li><p>Breakfast will be served between 8 am- 10.00 am. For Jain Meals, prior intimation is expected</p></li>
-        <li><p>Valid ID proof is mandatory for the check in</p></li>
-        <li><p>100 % payment to be made before the check in</p></li>
-        <li><p>Any additional services availed during the stay, needs to be paid immediately</p></li>
-        <li><p>Early check in/ late check out will be subject to availability and at additional cost</p></li>
-        <li><p>Management reserves the right to cancel or amend the bookings at any time</p></li>
-        <li><p>Bookings are refundable only before 72 hours of check-in</p></li>
-      </ul>
+      <div class="rules-tabs" role="tablist" aria-label="House rules">
+        <button class="filter" type="button" role="tab" id="rules-tab-0" aria-controls="rules-panel-0"><i class="fa-solid fa-person-swimming" aria-hidden="true"></i> Swimming Pool</button>
+        <button class="filter" type="button" role="tab" id="rules-tab-1" aria-controls="rules-panel-1"><i class="fa-solid fa-house-chimney" aria-hidden="true"></i> At the Resort</button>
+        <button class="filter" type="button" role="tab" id="rules-tab-2" aria-controls="rules-panel-2"><i class="fa-solid fa-key" aria-hidden="true"></i> Check-in &amp; Payments</button>
+      </div>
+      <div class="rules-panel" role="tabpanel" id="rules-panel-0" aria-labelledby="rules-tab-0">
+        <ul class="rules">
+          <li><p>Usage of swimming pool allowed only with proper costumes</p></li>
+          <li><p>Use proper swimming attire and shower first before using the pool</p></li>
+          <li><p>Food and drinks are not allowed in/near the pool area</p></li>
+          <li><p>Children must be accompanied by parents at all time</p></li>
+          <li><p>No diving in pool</p></li>
+        </ul>
+      </div>
+      <div class="rules-panel" role="tabpanel" id="rules-panel-1" aria-labelledby="rules-tab-1">
+        <ul class="rules">
+          <li><p>Smoking inside the rooms is not allowed</p></li>
+          <li><p>Pets are not allowed</p></li>
+          <li><p>No littering and plucking the plants</p></li>
+          <li><p>Kindly note the market is 8kms from the property, if the guest wish to order or buy something they need to pay in advance and also bare the travelling charges</p></li>
+          <li><p>Drinking is allowed inside the rooms and balcony</p></li>
+          <li><p>Any Damage caused to the property will be charged accordingly</p></li>
+          <li><p>No Loud music is allowed at the property</p></li>
+          <li><p>Please approach the reception for any concern</p></li>
+          <li><p>Breakfast will be served between 8 am- 10.00 am. For Jain Meals, prior intimation is expected</p></li>
+        </ul>
+      </div>
+      <div class="rules-panel" role="tabpanel" id="rules-panel-2" aria-labelledby="rules-tab-2">
+        <ul class="rules">
+          <li><p>Valid ID proof is mandatory for the check in</p></li>
+          <li><p>100 % payment to be made before the check in</p></li>
+          <li><p>Any additional services availed during the stay, needs to be paid immediately</p></li>
+          <li><p>Early check in/ late check out will be subject to availability and at additional cost</p></li>
+          <li><p>Management reserves the right to cancel or amend the bookings at any time</p></li>
+          <li><p>Bookings are refundable only before 72 hours of check-in</p></li>
+        </ul>
+      </div>
     </div>
   </section>
   </main>
@@ -385,6 +463,6 @@
     <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
   </button>
 
-  <script src="js/main.js?v=20261030c" defer></script>
+  <script src="js/main.js?v=20261030f" defer></script>
 </body>
 </html>

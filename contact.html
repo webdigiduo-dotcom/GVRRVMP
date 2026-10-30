@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="css/style.css?v=20261030c">
+  <link rel="stylesheet" href="css/style.css?v=20261030f">
   <link rel="preload" as="image" href="img/new/9.jpg">
   <script type="application/ld+json">
 {
@@ -146,8 +146,9 @@
       </div>
 
       <div class="contact-wrap" data-reveal="up">
-        <form class="contact-form" action="contact.php" method="post">
+        <form class="contact-form" action="https://wa.me/919819614673" method="get" target="_blank" data-whatsapp-form>
           <h2 class="title-md">Write To Us</h2>
+          <p class="form-note"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Your enquiry goes straight to us on WhatsApp.</p>
           <div class="field">
             <input type="text" id="formGroupExampleInput" name="name" placeholder=" " autocomplete="name" required>
             <label for="formGroupExampleInput">Name</label>
@@ -168,7 +169,8 @@
             <label for="exampleFormControlTextarea1">Message</label>
             <span class="field__line"></span>
           </div>
-          <button type="submit" class="btn" data-magnetic>Submit <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+          <button type="submit" class="btn btn--wa" data-magnetic><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Send on WhatsApp</button>
+          <p class="form-status" role="status"></p>
         </form>
         <div class="contact-map">
           <iframe title="Green Velvet Resort on Google Maps" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?q=green%20velvet%2C%20pawna%20lake%2C%20maharashtra&amp;key=AIzaSyDfawVF7z0zb57KuvbSdvIIBxYEioWjw48"></iframe>
@@ -248,6 +250,6 @@
     <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
   </button>
 
-  <script src="js/main.js?v=20261030c" defer></script>
+  <script src="js/main.js?v=20261030f" defer></script>
 </body>
 </html>

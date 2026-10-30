@@ -9,6 +9,7 @@
   const body = document.body;
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -98,6 +99,7 @@
   const progressBar = $('.scroll-progress');
   const toTop = $('.to-top');
   const parallaxEls = reduceMotion ? [] : $$('[data-parallax]');
+  const scrollHooks = []; // per-frame scroll effects, registered further down
   let ticking = false;
 
   const onScroll = () => {
@@ -125,6 +127,7 @@
       el.style.transform = `translate3d(0, ${(-box.top * speed).toFixed(1)}px, 0)`;
     });
 
+    scrollHooks.forEach((hook) => hook());
     if (pendingReveals.size) revealScrolledPast();
     ticking = false;
   };
@@ -135,7 +138,7 @@
       ticking = true;
     }
   }, { passive: true });
-  onScroll();
+  window.addEventListener('resize', onScroll);
 
   if (toTop) {
     toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
@@ -243,14 +246,33 @@
       this.play();
     }
 
+    // Dots by default; with data-thumbs, a strip of photo thumbnails under the slider instead
     buildDots() {
-      const wrap = $('.slider__dots', this.el);
+      const useThumbs = this.el.hasAttribute('data-thumbs');
+      let wrap = $('.slider__dots', this.el);
+      if (useThumbs) {
+        const viewport = $('.slider__viewport', this.el);
+        [$('.slider__ui', this.el), $('.slider__progress', this.el)].forEach((part) => {
+          if (part) viewport.appendChild(part);
+        });
+        wrap = document.createElement('div');
+        wrap.className = 'slider__thumbs';
+        this.el.appendChild(wrap);
+        this.thumbStrip = wrap;
+      }
       if (!wrap) return;
-      this.dots = this.slides.map((_, i) => {
+      this.dots = this.slides.map((slide, i) => {
         const dot = document.createElement('button');
         dot.type = 'button';
-        dot.className = 'slider__dot';
+        dot.className = useThumbs ? 'slider__thumb' : 'slider__dot';
         dot.setAttribute('aria-label', `Show slide ${i + 1} of ${this.count}`);
+        if (useThumbs) {
+          const thumb = document.createElement('img');
+          thumb.src = $('img', slide).getAttribute('src');
+          thumb.alt = '';
+          thumb.loading = 'lazy';
+          dot.appendChild(thumb);
+        }
         dot.addEventListener('click', () => this.go(i));
         wrap.appendChild(dot);
         return dot;
@@ -280,6 +302,10 @@
       });
       if (this.dots) {
         this.dots.forEach((dot, k) => dot.setAttribute('aria-current', String(k === this.index)));
+      }
+      if (this.thumbStrip && this.dots) {
+        const dot = this.dots[this.index];
+        this.thumbStrip.scrollTo({ left: dot.offsetLeft - this.thumbStrip.clientWidth / 2 + dot.offsetWidth / 2, behavior: 'smooth' });
       }
     }
 
@@ -452,13 +478,14 @@
     });
   }
 
-  /* ---------- Video reels slider ----------
+  /* ---------- Video reels ----------
      Each .reel card names its clip with data-src / data-start / data-end (seconds).
      One shared <video> moves into whichever card is active, so only one clip decodes at a time. */
   class Reels {
     constructor(root) {
       this.root = root;
       this.track = $('.reels__track', root);
+      this.probe = $('.reels__probe', root);
       this.cards = $$('.reel', root);
       this.count = this.cards.length;
       this.index = 0;
@@ -470,11 +497,17 @@
       this.modalOpen = false;
       this.dragged = false;
       this.raf = 0;
+      this.frame = 0;
+      this.tapTimer = 0;
+      this.lastTap = 0;
       this.countEl = $('.reels__count', root);
       this.playBtn = $('[data-reels-play]', root);
       this.muteBtn = $('[data-reels-mute]', root);
+      this.storyStrip = $('.reels__stories', root);
       this.glows = $$('.reels__glow span', root);
       this.glowIdx = 0;
+      this.ambient = $('.reels__ambient', root);
+      this.ambientCtx = this.ambient ? this.ambient.getContext('2d') : null;
 
       this.video = document.createElement('video');
       this.video.className = 'reel__video';
@@ -484,19 +517,23 @@
       this.video.setAttribute('aria-hidden', 'true');
       this.video.preload = 'auto';
       this.video.addEventListener('ended', () => this.next());
-      // rAF drives the smooth progress bar; timeupdate keeps clips advancing even when rAF is throttled
-      this.video.addEventListener('timeupdate', () => { if (!this.video.paused) this.check(); });
+      // rAF drives the smooth progress; timeupdate keeps clips advancing even when rAF is throttled
+      this.video.addEventListener('timeupdate', () => {
+        if (this.video.paused) return;
+        this.paintAmbient();
+        this.check();
+      });
 
-      this.buildDots();
+      this.buildHud();
+      this.buildStories();
       this.buildModal();
       this.bindControls();
       this.bindDrag();
+      this.bindCards();
+      if (finePointer && !reduceMotion) this.bindTilt();
 
-      this.cards.forEach((card, i) => card.addEventListener('click', () => {
-        if (this.dragged) return;
-        if (i === this.index) this.openModal(); else this.go(i);
-      }));
       this.track.addEventListener('keydown', (e) => {
+        if (e.target !== this.track) return;
         if (e.key === 'ArrowRight') { e.preventDefault(); this.go(this.index + 1); }
         if (e.key === 'ArrowLeft') { e.preventDefault(); this.go(this.index - 1); }
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.openModal(); }
@@ -505,15 +542,25 @@
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(([entry]) => {
           this.inView = entry.isIntersecting;
+          if (this.inView) this.enter();
           this.sync();
-        }, { threshold: 0.25 }).observe(root);
+        }, { threshold: 0.2 }).observe(root);
       } else {
         this.inView = true;
+        this.enter();
       }
       document.addEventListener('visibilitychange', () => this.sync());
 
       this.updatePlayBtn();
+      this.updateSound();
       this.activate(0);
+    }
+
+    // Cards start stacked and fan out the first time the section comes into view
+    enter() {
+      if (this.root.classList.contains('is-in')) return;
+      this.root.classList.add('is-in');
+      setTimeout(() => this.root.classList.add('is-fanned'), 1500);
     }
 
     clip(i = this.index) {
@@ -524,6 +571,7 @@
         end: parseFloat(card.dataset.end) || 0,
         title: $('.reel__title', card).textContent,
         tag: $('.reel__tag', card).textContent,
+        label: card.dataset.label || '',
         poster: $('.reel__poster', card).getAttribute('src'),
       };
     }
@@ -544,6 +592,7 @@
         card.style.zIndex = String(20 - abs);
         card.classList.toggle('is-active', d === 0);
         card.classList.toggle('is-far', abs > 2);
+        card.dataset.cursor = d === 0 ? 'Watch' : 'Play';
       });
       this.dots.forEach((dot, i) => {
         dot.setAttribute('aria-current', String(i === this.index));
@@ -553,10 +602,19 @@
         const pad = (n) => String(n).padStart(2, '0');
         this.countEl.textContent = `${pad(this.index + 1)} / ${pad(this.count)}`;
       }
+      if (this.storyStrip) {
+        const dot = this.dots[this.index];
+        this.storyStrip.scrollTo({
+          left: dot.offsetLeft - this.storyStrip.clientWidth / 2 + dot.offsetWidth / 2,
+          behavior: reduceMotion ? 'auto' : 'smooth',
+        });
+      }
     }
 
     activate(i) {
-      this.cards[this.index].classList.remove('is-playing');
+      const previous = this.cards[this.index];
+      previous.classList.remove('is-playing');
+      this.clearTilt(previous);
       this.setProgress(0);
       this.index = (i + this.count) % this.count;
       this.layout();
@@ -621,13 +679,26 @@
     tick() {
       cancelAnimationFrame(this.raf);
       const step = () => {
+        this.frame += 1;
+        if (this.frame % 8 === 0) this.paintAmbient();
         if (!this.check()) this.raf = requestAnimationFrame(step);
       };
       this.raf = requestAnimationFrame(step);
     }
 
+    // Samples the playing clip into a tiny canvas; CSS blurs it into a glow behind the stage
+    paintAmbient() {
+      const v = this.video;
+      if (!this.ambientCtx || v.readyState < 2) return;
+      try {
+        this.ambientCtx.drawImage(v, 0, 0, this.ambient.width, this.ambient.height);
+      } catch (err) {
+        this.ambientCtx = null;
+      }
+    }
+
     setProgress(p) {
-      const value = Math.min(Math.max(p, 0), 1).toFixed(4);
+      const value = clamp(p, 0, 1).toFixed(4);
       const bar = $('.reel__bar span', this.cards[this.index]);
       if (bar) bar.style.setProperty('--p', value);
       if (this.dots[this.index]) this.dots[this.index].style.setProperty('--p', value);
@@ -642,16 +713,34 @@
       this.glowIdx = (this.glowIdx + 1) % 2;
     }
 
-    buildDots() {
-      const wrap = $('.reels__dots', this.root);
+    buildHud() {
+      this.cards.forEach((card) => {
+        const { title } = this.clip(this.cards.indexOf(card));
+        const share = encodeURIComponent(`Green Velvet Resort, Pawna: ${title} https://greenvelvetresort.in/#videos`);
+        card.insertAdjacentHTML('beforeend', `
+          <div class="reel__profile"><img src="img/GreenVelvet/logo_2.png" alt=""><span>greenvelvetresort</span></div>
+          <div class="reel__actions">
+            <button class="reel__act" type="button" data-act="like" aria-pressed="false" aria-label="Like this video"><i class="fa-regular fa-heart" aria-hidden="true"></i></button>
+            <button class="reel__act" type="button" data-act="sound" aria-label="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button>
+            <a class="reel__act" data-act="share" href="https://wa.me/?text=${share}" target="_blank" rel="noopener" aria-label="Share on WhatsApp"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></a>
+            <button class="reel__act" type="button" data-act="full" aria-label="Watch full screen"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+          </div>`);
+      });
+    }
+
+    buildStories() {
       this.dots = this.cards.map((card, i) => {
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'reels__dot';
-        dot.setAttribute('aria-label', `Play video ${i + 1}: ${$('.reel__title', card).textContent}`);
-        dot.addEventListener('click', () => this.go(i));
-        if (wrap) wrap.appendChild(dot);
-        return dot;
+        const { title, label, poster } = this.clip(i);
+        const story = document.createElement('button');
+        story.type = 'button';
+        story.className = 'story';
+        story.setAttribute('aria-label', `Play video ${i + 1}: ${title}`);
+        story.innerHTML = '<span class="story__ring"><img alt="" loading="lazy"></span><span class="story__label"></span>';
+        $('img', story).src = poster;
+        $('.story__label', story).textContent = label;
+        story.addEventListener('click', () => this.go(i));
+        if (this.storyStrip) this.storyStrip.appendChild(story);
+        return story;
       });
     }
 
@@ -659,6 +748,110 @@
       if (!this.playBtn) return;
       this.playBtn.innerHTML = `<i class="fa-solid ${this.autoplay ? 'fa-pause' : 'fa-play'}" aria-hidden="true"></i>`;
       this.playBtn.setAttribute('aria-label', this.autoplay ? 'Pause videos' : 'Play videos');
+    }
+
+    updateSound() {
+      const label = this.muted ? 'Turn sound on' : 'Turn sound off';
+      const icon = `<i class="fa-solid ${this.muted ? 'fa-volume-xmark' : 'fa-volume-high'}" aria-hidden="true"></i>`;
+      [this.muteBtn, ...$$('[data-act="sound"]', this.root)].forEach((btn) => {
+        if (!btn) return;
+        btn.innerHTML = icon;
+        btn.setAttribute('aria-label', label);
+      });
+      if (this.muteBtn) this.muteBtn.setAttribute('aria-pressed', String(!this.muted));
+    }
+
+    toggleSound() {
+      this.muted = !this.muted;
+      this.video.muted = this.muted;
+      this.updateSound();
+      if (!this.muted && !this.autoplay) {
+        this.autoplay = true;
+        this.updatePlayBtn();
+      }
+      this.sync();
+    }
+
+    toggleLike(card, x, y) {
+      const on = !card.classList.contains('is-liked');
+      this.setLiked(card, on);
+      if (on) this.burst(card, x, y);
+    }
+
+    setLiked(card, on) {
+      card.classList.toggle('is-liked', on);
+      const btn = $('[data-act="like"]', card);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.innerHTML = `<i class="${on ? 'fa-solid' : 'fa-regular'} fa-heart" aria-hidden="true"></i>`;
+    }
+
+    burst(card, x, y) {
+      const box = card.getBoundingClientRect();
+      const burst = document.createElement('span');
+      burst.className = 'reel__burst';
+      burst.style.left = `${x === undefined ? box.width / 2 : x - box.left}px`;
+      burst.style.top = `${y === undefined ? box.height / 2 : y - box.top}px`;
+      for (let i = 0; i < 8; i += 1) {
+        const heart = document.createElement('i');
+        heart.className = 'fa-solid fa-heart';
+        const angle = (i / 7) * Math.PI * 2;
+        heart.style.setProperty('--tx', `${(Math.cos(angle) * 90).toFixed(0)}px`);
+        heart.style.setProperty('--ty', `${(Math.sin(angle) * 90).toFixed(0)}px`);
+        burst.appendChild(heart);
+      }
+      card.appendChild(burst);
+      setTimeout(() => burst.remove(), 1000);
+    }
+
+    bindCards() {
+      this.cards.forEach((card, i) => card.addEventListener('click', (e) => {
+        if (this.dragged) return;
+        const action = e.target.closest('[data-act]');
+        if (action) {
+          const act = action.dataset.act;
+          if (act === 'like') this.toggleLike(card);
+          if (act === 'sound') this.toggleSound();
+          if (act === 'full') this.openModal();
+          return;
+        }
+        if (i !== this.index) {
+          this.go(i);
+          return;
+        }
+        // One tap on the playing reel opens it full screen; two quick taps like it
+        const now = Date.now();
+        if (now - this.lastTap < 300) {
+          clearTimeout(this.tapTimer);
+          this.lastTap = 0;
+          this.setLiked(card, true);
+          this.burst(card, e.clientX, e.clientY);
+          return;
+        }
+        this.lastTap = now;
+        this.tapTimer = setTimeout(() => this.openModal(), 300);
+      }));
+    }
+
+    bindTilt() {
+      this.cards.forEach((card) => {
+        card.addEventListener('pointermove', (e) => {
+          if (!card.classList.contains('is-active') || this.track.classList.contains('is-dragging')) return;
+          const box = card.getBoundingClientRect();
+          const x = (e.clientX - box.left) / box.width;
+          const y = (e.clientY - box.top) / box.height;
+          card.classList.add('is-tilting');
+          card.style.setProperty('--rx', `${((0.5 - y) * 9).toFixed(2)}deg`);
+          card.style.setProperty('--ry', `${((x - 0.5) * 12).toFixed(2)}deg`);
+          card.style.setProperty('--gx', `${(x * 100).toFixed(0)}%`);
+          card.style.setProperty('--gy', `${(y * 100).toFixed(0)}%`);
+        });
+        card.addEventListener('pointerleave', () => this.clearTilt(card));
+      });
+    }
+
+    clearTilt(card) {
+      card.classList.remove('is-tilting');
+      ['--rx', '--ry', '--gx', '--gy'].forEach((prop) => card.style.removeProperty(prop));
     }
 
     bindControls() {
@@ -673,20 +866,7 @@
           this.sync();
         });
       }
-      if (this.muteBtn) {
-        this.muteBtn.addEventListener('click', () => {
-          this.muted = !this.muted;
-          this.video.muted = this.muted;
-          this.muteBtn.setAttribute('aria-pressed', String(!this.muted));
-          this.muteBtn.setAttribute('aria-label', this.muted ? 'Turn sound on' : 'Turn sound off');
-          this.muteBtn.innerHTML = `<i class="fa-solid ${this.muted ? 'fa-volume-xmark' : 'fa-volume-high'}" aria-hidden="true"></i>`;
-          if (!this.muted && !this.autoplay) {
-            this.autoplay = true;
-            this.updatePlayBtn();
-          }
-          this.sync();
-        });
-      }
+      if (this.muteBtn) this.muteBtn.addEventListener('click', () => this.toggleSound());
     }
 
     bindDrag() {
@@ -706,6 +886,7 @@
         if (!this.dragged && Math.abs(dx) > 6) {
           this.dragged = true;
           this.track.classList.add('is-dragging');
+          this.clearTilt(this.cards[this.index]);
         }
         if (this.dragged) this.track.style.setProperty('--drag', `${dx}px`);
       });
@@ -715,10 +896,7 @@
         this.track.classList.remove('is-dragging');
         this.track.style.setProperty('--drag', '0px');
         if (!this.dragged) return;
-        const w = this.cards[0].offsetWidth;
-        const spread = window.innerWidth <= 640
-          ? w * 0.74
-          : Math.min(w * 0.82, (window.innerWidth / 2 - 92 - w * 0.45) / 2); // mirrors --spread in CSS
+        const spread = (this.probe && this.probe.offsetWidth) || this.cards[0].offsetWidth * 0.8;
         let steps = Math.round(-dx / spread);
         if (steps === 0 && Math.abs(dx) > 40) steps = dx < 0 ? 1 : -1;
         if (steps) this.go(this.index + steps);
@@ -795,6 +973,339 @@
   }
   $$('[data-reels]').forEach((el) => new Reels(el));
 
+  /* ---------- Fireflies ---------- */
+  class Fireflies {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.target = parseInt(canvas.dataset.fireflies, 10) || 24;
+      this.visible = false;
+      this.raf = 0;
+      this.sprite = Fireflies.makeSprite();
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
+      new IntersectionObserver(([entry]) => {
+        this.visible = entry.isIntersecting;
+        this.toggle();
+      }).observe(canvas);
+      document.addEventListener('visibilitychange', () => this.toggle());
+    }
+
+    static makeSprite() {
+      const sprite = document.createElement('canvas');
+      sprite.width = 48;
+      sprite.height = 48;
+      const ctx = sprite.getContext('2d');
+      const glow = ctx.createRadialGradient(24, 24, 1, 24, 24, 24);
+      glow.addColorStop(0, 'rgba(240, 255, 170, 1)');
+      glow.addColorStop(0.25, 'rgba(190, 230, 90, .55)');
+      glow.addColorStop(1, 'rgba(169, 207, 56, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, 48, 48);
+      return sprite;
+    }
+
+    resize() {
+      const box = this.canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      this.w = box.width;
+      this.h = box.height;
+      this.canvas.width = Math.round(box.width * dpr);
+      this.canvas.height = Math.round(box.height * dpr);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.round(this.target * Math.min(this.w / 1400, 1)) + 6;
+      this.flies = Array.from({ length: count }, () => ({
+        x: Math.random() * this.w,
+        y: Math.random() * this.h,
+        r: 6 + Math.random() * 10,
+        dir: Math.random() * Math.PI * 2,
+        speed: 0.15 + Math.random() * 0.35,
+        pulse: 0.6 + Math.random() * 1.4,
+        phase: Math.random() * Math.PI * 2,
+      }));
+    }
+
+    toggle() {
+      cancelAnimationFrame(this.raf);
+      if (!this.visible || document.hidden) return;
+      const draw = (time) => {
+        const { ctx, w, h } = this;
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'lighter';
+        this.flies.forEach((f) => {
+          f.dir += (Math.random() - 0.5) * 0.25;
+          f.x = (f.x + Math.cos(f.dir) * f.speed + w) % w;
+          f.y = (f.y + Math.sin(f.dir) * f.speed + h) % h;
+          ctx.globalAlpha = 0.2 + 0.8 * (0.5 + 0.5 * Math.sin((time / 1000) * f.pulse + f.phase));
+          ctx.drawImage(this.sprite, f.x - f.r, f.y - f.r, f.r * 2, f.r * 2);
+        });
+        this.raf = requestAnimationFrame(draw);
+      };
+      this.raf = requestAnimationFrame(draw);
+    }
+  }
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    $$('[data-fireflies]').forEach((canvas) => new Fireflies(canvas));
+  }
+
+  /* ---------- Hero: the film window opens up as you scroll (large screens) ---------- */
+  const hero = $('[data-hero]');
+  if (hero) {
+    const intro = $('.hero__intro', hero);
+    const pinQuery = window.matchMedia('(min-width: 1025px) and (min-height: 640px)');
+    const syncHero = () => {
+      hero.classList.toggle('hero--pinned', pinQuery.matches && !reduceMotion);
+    };
+    pinQuery.addEventListener('change', () => { syncHero(); onScroll(); });
+    syncHero();
+    scrollHooks.push(() => {
+      if (!hero.classList.contains('hero--pinned')) return;
+      const box = hero.getBoundingClientRect();
+      const raw = clamp(-box.top / (box.height - window.innerHeight), 0, 1);
+      const p = raw * raw * (3 - 2 * raw);
+      const top0 = intro.offsetTop + intro.offsetHeight + 26;
+      const side0 = intro.getBoundingClientRect().left + parseFloat(getComputedStyle(intro).paddingLeft);
+      hero.style.setProperty('--p', p.toFixed(3));
+      hero.style.setProperty('--t0', `${top0}px`);
+      hero.style.setProperty('--s0', `${side0.toFixed(0)}px`);
+      hero.style.setProperty('--ct', `${(top0 * (1 - p)).toFixed(1)}px`);
+      hero.style.setProperty('--cs', `${(side0 * (1 - p)).toFixed(1)}px`);
+      hero.style.setProperty('--cb', `${(28 * (1 - p)).toFixed(1)}px`);
+      hero.style.setProperty('--cr', `${(28 * (1 - p)).toFixed(1)}px`);
+    });
+  }
+
+  /* ---------- Words that light up as you read down the page ---------- */
+  if (!reduceMotion) {
+    $$('[data-scrub]').forEach((el) => {
+      const words = el.textContent.trim().split(/\s+/);
+      el.textContent = '';
+      const spans = words.map((word, i) => {
+        const span = document.createElement('span');
+        span.className = 'sw';
+        span.textContent = word;
+        el.appendChild(span);
+        if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
+        return span;
+      });
+      scrollHooks.push(() => {
+        const box = el.getBoundingClientRect();
+        const vh = window.innerHeight;
+        if (box.top > vh) return;
+        const lit = clamp((vh * 0.9 - box.top) / (box.height + vh * 0.35), 0, 1) * spans.length;
+        spans.forEach((span, i) => { span.style.opacity = clamp(0.22 + (lit - i) * 0.78, 0.22, 1).toFixed(2); });
+      });
+    });
+
+    /* ---------- Outlined text that slides sideways with scroll ---------- */
+    $$('[data-scroll-x]').forEach((el) => {
+      const speed = parseFloat(el.dataset.scrollX) || 0.15;
+      scrollHooks.push(() => {
+        const box = el.parentElement.getBoundingClientRect();
+        if (box.bottom < 0 || box.top > window.innerHeight) return;
+        el.style.transform = `translate3d(${(box.top * speed).toFixed(1)}px, 0, 0)`;
+      });
+    });
+  }
+
+  /* ---------- Room lens: second photo through a circle that follows the mouse ---------- */
+  if (finePointer) {
+    $$('[data-lens]').forEach((lens) => {
+      const place = (e) => {
+        const box = lens.getBoundingClientRect();
+        lens.style.setProperty('--x', `${(e.clientX - box.left).toFixed(0)}px`);
+        lens.style.setProperty('--y', `${(e.clientY - box.top).toFixed(0)}px`);
+      };
+      lens.addEventListener('pointerenter', (e) => { place(e); lens.classList.add('is-on'); });
+      lens.addEventListener('pointermove', place);
+      lens.addEventListener('pointerleave', () => lens.classList.remove('is-on'));
+    });
+  }
+
+  /* ---------- Rooms page: section tabs bar ---------- */
+  const subnav = $('[data-subnav]');
+  if (subnav) {
+    const strip = $('.subnav__track', subnav);
+    const ink = $('.subnav__ink', subnav);
+    const links = $$('a', subnav);
+    const targets = links.map((link) => document.getElementById(link.getAttribute('href').slice(1)));
+    let current = -1;
+    const setActive = (i) => {
+      if (i === current) return;
+      current = i;
+      links.forEach((link, k) => link.setAttribute('aria-current', String(k === i)));
+      const link = links[i];
+      ink.style.setProperty('--ink-x', `${link.offsetLeft}px`);
+      ink.style.setProperty('--ink-w', `${link.offsetWidth}px`);
+      strip.scrollTo({
+        left: link.offsetLeft - strip.clientWidth / 2 + link.offsetWidth / 2,
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      });
+    };
+    scrollHooks.push(() => {
+      const line = subnav.getBoundingClientRect().bottom + 80;
+      let active = 0;
+      targets.forEach((target, i) => {
+        if (target && target.getBoundingClientRect().top <= line) active = i;
+      });
+      setActive(active);
+    });
+    window.addEventListener('resize', () => { current = -1; });
+  }
+
+  /* ---------- Rooms page: panels stack on top of each other ---------- */
+  const stack = $('[data-stack]');
+  if (stack) {
+    const panels = $$('.room-panel', stack);
+    const placePanels = () => {
+      panels.forEach((panel) => {
+        panel.style.setProperty('--stick', `${Math.min(146, window.innerHeight - panel.offsetHeight - 16)}px`);
+      });
+    };
+    placePanels();
+    window.addEventListener('resize', placePanels);
+    window.addEventListener('load', placePanels);
+    scrollHooks.push(() => {
+      panels.forEach((panel, i) => {
+        const next = panels[i + 1];
+        if (!next || reduceMotion) return;
+        if (getComputedStyle(panel).position !== 'sticky') {
+          panel.style.removeProperty('--shrink');
+          return;
+        }
+        const box = panel.getBoundingClientRect();
+        const covered = clamp(1 - (next.getBoundingClientRect().top - box.top) / box.height, 0, 1);
+        panel.style.setProperty('--shrink', covered.toFixed(3));
+      });
+    });
+  }
+
+  /* ---------- Rooms page: guided tour with hotspots ---------- */
+  $$('[data-tour]').forEach((tour) => {
+    const media = $('.tour__media', tour);
+    const pins = $$('.pin', tour);
+    const legend = $('.tour__legend', tour);
+    let timer = 0;
+    let active = -1;
+    let handsOn = false;
+    const chips = pins.map((pin, i) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'tour__chip';
+      chip.setAttribute('aria-pressed', 'false');
+      chip.innerHTML = $('.pin__card', pin).innerHTML;
+      chip.addEventListener('click', () => { handsOn = true; clearInterval(timer); show(i); });
+      legend.appendChild(chip);
+      return chip;
+    });
+    const show = (i) => {
+      active = i;
+      pins.forEach((pin, k) => pin.classList.toggle('is-open', k === i));
+      chips.forEach((chip, k) => chip.setAttribute('aria-pressed', String(k === i)));
+      media.style.setProperty('--ox', pins[i].style.getPropertyValue('--x'));
+      media.style.setProperty('--oy', pins[i].style.getPropertyValue('--y'));
+      media.classList.add('is-zoomed');
+    };
+    pins.forEach((pin, i) => {
+      pin.addEventListener('click', () => { handsOn = true; clearInterval(timer); show(i); });
+      pin.addEventListener('pointerenter', () => { handsOn = true; clearInterval(timer); show(i); });
+    });
+    new IntersectionObserver(([entry]) => {
+      clearInterval(timer);
+      if (!entry.isIntersecting || handsOn) return;
+      show((active + 1) % pins.length);
+      if (!reduceMotion) timer = setInterval(() => show((active + 1) % pins.length), 3200);
+    }, { threshold: 0.35 }).observe(tour);
+  });
+
+  /* ---------- Tabs (house rules) ---------- */
+  $$('[data-tabs]').forEach((group) => {
+    const tabs = $$('[role="tab"]', group);
+    const panels = $$('[role="tabpanel"]', group);
+    const select = (i, focus) => {
+      tabs.forEach((tab, k) => {
+        tab.classList.toggle('is-active', k === i);
+        tab.setAttribute('aria-selected', String(k === i));
+        tab.tabIndex = k === i ? 0 : -1;
+      });
+      panels.forEach((panel, k) => { panel.hidden = k !== i; });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') select((i + 1) % tabs.length, true);
+        if (e.key === 'ArrowLeft') select((i - 1 + tabs.length) % tabs.length, true);
+      });
+    });
+    select(0);
+  });
+
+  /* ---------- Cursor companion (mouse only) ---------- */
+  if (finePointer && !reduceMotion) {
+    const cursor = document.createElement('div');
+    cursor.className = 'cursor';
+    cursor.setAttribute('aria-hidden', 'true');
+    cursor.innerHTML = '<span class="cursor__ring"></span><span class="cursor__label"></span>';
+    body.appendChild(cursor);
+    const label = $('.cursor__label', cursor);
+    let x = 0;
+    let y = 0;
+    let cx = 0;
+    let cy = 0;
+    let raf = 0;
+    const follow = () => {
+      cx += (x - cx) * 0.18;
+      cy += (y - cy) * 0.18;
+      cursor.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
+      raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.3 ? requestAnimationFrame(follow) : 0;
+    };
+    document.addEventListener('pointermove', (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!cursor.classList.contains('is-on')) {
+        cx = x;
+        cy = y;
+        cursor.classList.add('is-on');
+      }
+      if (!raf) raf = requestAnimationFrame(follow);
+      const hit = e.target.closest ? e.target.closest('[data-cursor], a, button') : null;
+      const text = hit && hit.dataset.cursor ? hit.dataset.cursor : '';
+      cursor.classList.toggle('has-label', Boolean(text));
+      cursor.classList.toggle('is-link', Boolean(hit) && !text);
+      if (text) label.textContent = text;
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => cursor.classList.remove('is-on'));
+  }
+
+  /* ---------- Enquiry form: opens WhatsApp with the details filled in ---------- */
+  $$('[data-whatsapp-form]').forEach((form) => {
+    const status = $('.form-status', form);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const blank = $$('[required]', form).find((field) => !field.value.trim());
+      if (blank) {
+        blank.value = '';
+        form.reportValidity();
+        return;
+      }
+      const data = new FormData(form);
+      const value = (name) => String(data.get(name)).trim();
+      const text = [
+        'Hello Green Velvet Resort, I would like to make an enquiry.',
+        '',
+        `*Name:* ${value('name')}`,
+        `*Phone:* ${value('phone')}`,
+        `*Email:* ${value('email')}`,
+        `*Message:* ${value('message')}`,
+      ].join('\n');
+      const url = `${form.getAttribute('action')}?text=${encodeURIComponent(text)}`;
+      status.innerHTML = 'WhatsApp is opening with your enquiry. Press send to reach us. <a target="_blank" rel="noopener">Not opened? Tap here.</a>';
+      $('a', status).href = url;
+      if (!window.open(url, '_blank', 'noopener')) window.location.href = url;
+    });
+  });
+
   /* ---------- Pointer effects (desktop only) ---------- */
   if (finePointer && !reduceMotion) {
     $$('[data-tilt]').forEach((card) => {
@@ -817,4 +1328,6 @@
       btn.addEventListener('pointerleave', () => { btn.style.transform = ''; });
     });
   }
+
+  onScroll();
 })();
